@@ -5,6 +5,8 @@ import (
 	"testvm/conf"
 	"testvm/models/loadinfo"
 	"testvm/models/redismanager"
+	"testvm/models/logging"
+	"github.com/Sirupsen/logrus"
 )
 
 type RetrieveServersController struct {
@@ -23,12 +25,20 @@ func (rsc *RetrieveServersController) Get() {
 	rdsm := new(redismanager.RedisManager)
 	if ok, _ := rdsm.Connect(host, port); !ok {
 		rsc.Ctx.WriteString("Fail: redis connect fail!\n")
+		logging.GetLogger().WithFields(logrus.Fields{
+			"package" : "controllers",
+			"file" : "retrieve_servers.go",
+		}).Infoln("redis connect fail!")
 		return
 	}
 	defer rdsm.Close()
 	ret, err := rdsm.GetAll(rdskeyname)
 	if err != nil {
 		rsc.Ctx.WriteString("Fail: redis getall fail!\n")
+		logging.GetLogger().WithFields(logrus.Fields{
+			"package" : "controllers",
+			"file" : "retrieve_servers.go",
+		}).Infoln("redis getall fail!")
 		return
 	}
 	totalStreamInfo := new(loadinfo.StreamInfo)
@@ -36,7 +46,11 @@ func (rsc *RetrieveServersController) Get() {
 		tmpStream := make(loadinfo.StreamsAmt)
 		tmpStream = tmpStream.FromString(v)
 		if tmpStream == nil {
-			rsc.Ctx.WriteString("Fail: convert from string fail!\n")
+			rsc.Ctx.WriteString("Fail: StreamAmt convert from string fail!\n")
+			logging.GetLogger().WithFields(logrus.Fields{
+				"package" : "controllers",
+				"file" : "retrieve_servers.go",
+			}).Infoln("StreamAmt convert from string fail!")
 			return
 		}
 		tmp := new(loadinfo.StreamInfo)
@@ -45,9 +59,20 @@ func (rsc *RetrieveServersController) Get() {
 	}
 	totalSubStream := totalStreamInfo.GetTotalSub()
 	if totalSubStream > limit {
+		rsc.SetStatus(0)
 		rsc.Ctx.WriteString("no usalbe lbaddress: substreaming more than limit\n")
+		logging.GetLogger().WithFields(logrus.Fields{
+			"package" : "controllers",
+			"file" : "retrieve_servers.go",
+		}).Infoln("no usalbe lbaddress: substreaming more than limit!")
 	} else {
-		rsc.Ctx.WriteString(lbaddr + "\n")
+		rsc.SetStatus(1)
+		rsc.Ctx.WriteString(lbaddr)
+		logging.GetLogger().WithFields(logrus.Fields{
+			"package" : "controllers",
+			"file" : "retrieve_servers.go",
+			"lbaddr" : lbaddr,
+		}).Infoln("return lbaddress success!")
 	}
 }
 

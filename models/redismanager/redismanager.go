@@ -5,6 +5,8 @@ import (
 	"github.com/garyburd/redigo/redis"
 	_ "testvm/conf"
 	. "testvm/models/loadinfo"
+	"testvm/models/logging"
+	"github.com/Sirupsen/logrus"
 )
 
 type RedisManager struct {
@@ -15,11 +17,14 @@ func (rm *RedisManager) Connect(host string, port uint) (bool, error) {
 	var err error
 	rm.connect, err = redis.Dial("tcp", fmt.Sprintf("%v:%v", host, port))
 	if err != nil {
-		fmt.Println("Connect to redis error! [Error]:", err)
+		logging.GetLogger().WithFields(logrus.Fields{
+			"package" : "redismanager",
+			"file" : "redismanager.go",
+			"fail with error" : err,
+		}).Errorln("redis connect fail!")
 		return false, err
 	}
 	return true, nil
-	//连接成功
 }
 
 func (rm *RedisManager) Add(loadinfo LoadInfo, rdskeyname string) (bool, error) {
@@ -27,7 +32,11 @@ func (rm *RedisManager) Add(loadinfo LoadInfo, rdskeyname string) (bool, error) 
 		str_v := v.String()
 		_, err := rm.connect.Do("HSET", rdskeyname, k, str_v)
 		if err != nil {
-			//redis hset failed
+			logging.GetLogger().WithFields(logrus.Fields{
+				"package" : "redismanager",
+				"file" : "redismanager.go",
+				"fail with error" : err,
+			}).Errorln("redis hset fail!")
 			return false, err
 		}
 	}
@@ -37,7 +46,11 @@ func (rm *RedisManager) Add(loadinfo LoadInfo, rdskeyname string) (bool, error) 
 func (rm *RedisManager) GetAll(rdskeyname string) (map[string]string, error) {
 	ret, err := redis.StringMap(rm.connect.Do("HGETALL", rdskeyname))
 	if err != nil {
-		//redis hset failed
+		logging.GetLogger().WithFields(logrus.Fields{
+			"package" : "redismanager",
+			"file" : "redismanager.go",
+			"fail with error" : err,
+		}).Errorln("redis hgetall fail!")
 		return nil, err
 	} else {
 		return ret, nil

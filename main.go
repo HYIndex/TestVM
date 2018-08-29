@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/astaxie/beego"
-	_ "testvm/routers"
 	_ "testvm/conf"
+	_ "testvm/routers"
 )
 
 func main() {

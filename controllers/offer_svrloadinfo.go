@@ -5,6 +5,8 @@ import (
 	"testvm/conf"
 	"testvm/models/loadinfo"
 	"testvm/models/redismanager"
+	"testvm/models/logging"
+	"github.com/Sirupsen/logrus"
 )
 
 type OfferLoadInfoController struct {
@@ -20,18 +22,33 @@ func (obic *OfferLoadInfoController) Get() {
 	rdsm := new(redismanager.RedisManager)
 	if ok, _ := rdsm.Connect(host, port); !ok {
 		obic.Ctx.WriteString("Fail: redis connect fail!\n")
+		logging.GetLogger().WithFields(logrus.Fields{
+			"package" : "controllers",
+			"file" : "offer_svrloadinfo.go",
+		}).Infoln("redis connect fail!")
 		return
 	}
 	defer rdsm.Close()
 	ret, err := rdsm.GetAll(rdskeyname)
 	if err != nil {
 		obic.Ctx.WriteString("Fail: redis getall fail!\n")
+		logging.GetLogger().WithFields(logrus.Fields{
+			"package" : "controllers",
+			"file" : "offer_svrloadinfo.go",
+		}).Infoln("redis getall fail!")
 		return
 	}
 	respInfo := new(loadinfo.ResponseInfo)
 	for k, v := range ret {
 		tmpStream := make(loadinfo.StreamsAmt)
 		tmpStream = tmpStream.FromString(v)
+		if tmpStream == nil {
+			logging.GetLogger().WithFields(logrus.Fields{
+				"package" : "controllers",
+				"file" : "offer_svrloadinfo.go",
+			}).Infoln("StreamAmt convert from string failed!")
+			return
+		}
 		tmp := new(loadinfo.StreamInfo)
 		tmp.Create(tmpStream)
 		respInfo.Total.Add(tmp)
@@ -42,4 +59,8 @@ func (obic *OfferLoadInfoController) Get() {
 	}
 	obic.Data["json"] = respInfo
 	obic.ServeJSON()
+	logging.GetLogger().WithFields(logrus.Fields{
+		"package" : "controllers",
+		"file" : "offer_svrloadinfo.go",
+	}).Infoln("return loadinfo with join response success!")
 }

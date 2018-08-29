@@ -1,12 +1,12 @@
 package conf
 
 import (
-	"fmt"
 	"github.com/astaxie/beego"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+	"github.com/Sirupsen/logrus"
 )
 
 type Config struct {
@@ -15,17 +15,26 @@ type Config struct {
 	RDS_Host    string
 	RDS_Port    uint
 	RDS_Keyname string
+	LOG_Level	string
 }
 
 var (
 	globalConfig Config
 	configLock   = new(sync.RWMutex)
+	log = logrus.New()
 )
 
 func init() {
 	//加载配置
+	log.Out = os.Stdout
+	log.Level = logrus.DebugLevel
+	log.Formatter = new(logrus.JSONFormatter)
+
 	if !loadConfig() {
-		//
+		log.WithFields(logrus.Fields{
+			"package" : "conf",
+			"function" : "init",
+		}).Fatalln("Loag config file failed!")
 		os.Exit(1)
 	}
 	reload()
@@ -50,6 +59,7 @@ func loadConfig() bool {
 	tmpport, _ := beego.AppConfig.Int("redis::port")
 	temp.RDS_Port = uint(tmpport)
 	temp.RDS_Keyname = beego.AppConfig.String("redis::keyname")
+	temp.LOG_Level = beego.AppConfig.String("log::level")
 	configLock.Lock()
 	globalConfig = temp
 	configLock.Unlock()
@@ -63,11 +73,16 @@ func reload() {
 	go func() {
 		for {
 			<-s
-			fmt.Println("reload config!")
 			if !loadConfig() {
-				//
+				log.WithFields(logrus.Fields{
+					"package" : "conf",
+					"function" : "reload",
+				}).Fatalln("Loag config file failed!")
 				os.Exit(1)
 			}
+			log.WithFields(logrus.Fields{
+				"package" : "conf",
+			}).Infoln("Config file reloaded!")
 		}
 	}()
 }

@@ -19,7 +19,7 @@ const (
 	BI_SRC = "SRC"
 )
 
-type StreamsAmt map[string]uint       //流数量
+type StreamsAmt map[string]uint     //流数量
 type LoadInfo map[string]StreamsAmt //负载信息
 
 type StreamInfo struct {
