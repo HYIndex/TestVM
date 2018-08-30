@@ -1,3 +1,7 @@
+/*
+ * 获取当前IDC的webrtc的负载信息
+ */
+
 package controllers
 
 import (
@@ -63,4 +67,8 @@ func (obic *OfferLoadInfoController) Get() {
 		"package" : "controllers",
 		"file" : "offer_svrloadinfo.go",
 	}).Infoln("return loadinfo with join response success!")
+}
+
+func (obic *OfferLoadInfoController) Post() {
+	obic.Get()
 }

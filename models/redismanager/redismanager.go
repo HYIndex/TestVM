@@ -1,3 +1,7 @@
+/*
+ * Redis管理器，提供连接、关闭、写入和读取接口
+ */
+
 package redismanager
 
 import (

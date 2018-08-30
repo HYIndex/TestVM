@@ -10,12 +10,12 @@ import (
 )
 
 type Config struct {
-	RS_Slbaddr  string //LB地址
-	RS_Limit    uint   //限制人数
-	RDS_Host    string
-	RDS_Port    uint
-	RDS_Keyname string
-	LOG_Level	string
+	RS_Slbaddr  string // LB地址
+	RS_Limit    uint   // 限制人数
+	RDS_Host    string // Redis服务主机ip
+	RDS_Port    uint   // Redis服务进程端口
+	RDS_Keyname string // Redis 保存负载信息的键名
+	LOG_Level	string // 日志等级
 }
 
 var (
@@ -40,6 +40,8 @@ func init() {
 	reload()
 }
 
+// 给其他包提供全局配置的接口
+// 热加载会在更外的go线程中使用globalConfig，需加锁保护
 func GlobalConfig() Config {
 	configLock.RLock()
 	defer configLock.RUnlock()
@@ -47,7 +49,7 @@ func GlobalConfig() Config {
 }
 
 func loadConfig() bool {
-	err := beego.LoadAppConfig("ini", "conf/config.ini")
+	err := beego.LoadAppConfig("ini", "/Users/zhy/go/src/testvm/conf/config.ini")
 	if err != nil {
 		return false
 	}

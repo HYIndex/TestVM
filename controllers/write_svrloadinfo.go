@@ -1,3 +1,7 @@
+/*
+ * 写入某个服务器进程负载信息的接口
+ */
+
 package controllers
 
 import (

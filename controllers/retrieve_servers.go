@@ -1,3 +1,7 @@
+/*
+ * 给客户端返回可用的服务器节点
+ */
+
 package controllers
 
 import (
