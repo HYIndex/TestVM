@@ -39,7 +39,7 @@ func (wc *WriteLoadInfoController) Post() {
 		port := conf.GlobalConfig().RDS_Port
 		ok, _ := rdsm.Connect(host, port)
 		if !ok {
-			response = "Fail: connect redis failed!\n"
+			response = "Fail\n"
 			logging.GetLogger().WithFields(logrus.Fields{
 				"package" : "controllers",
 				"file" : "write_svrloadinfo.go",
@@ -47,7 +47,7 @@ func (wc *WriteLoadInfoController) Post() {
 			break
 		}
 		if ok, _ := rdsm.Add(wc.bdinfo, rdskeyname); !ok {
-			response = "Fail: redis add loadinfo failed!\n"
+			response = "Fail!\n"
 			logging.GetLogger().WithFields(logrus.Fields{
 				"package" : "controllers",
 				"file" : "write_svrloadinfo.go",

@@ -49,7 +49,7 @@ func GlobalConfig() Config {
 }
 
 func loadConfig() bool {
-	err := beego.LoadAppConfig("ini", "/Users/zhy/go/src/testvm/conf/config.ini")
+	err := beego.LoadAppConfig("ini", "/usr/local/testvm/conf/config.ini")
 	if err != nil {
 		return false
 	}

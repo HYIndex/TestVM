@@ -25,7 +25,7 @@ func (obic *OfferLoadInfoController) Get() {
 
 	rdsm := new(redismanager.RedisManager)
 	if ok, _ := rdsm.Connect(host, port); !ok {
-		obic.Ctx.WriteString("Fail: redis connect fail!\n")
+		obic.Ctx.WriteString("Fail!\n")
 		logging.GetLogger().WithFields(logrus.Fields{
 			"package" : "controllers",
 			"file" : "offer_svrloadinfo.go",
@@ -33,9 +33,10 @@ func (obic *OfferLoadInfoController) Get() {
 		return
 	}
 	defer rdsm.Close()
+
 	ret, err := rdsm.GetAll(rdskeyname)
 	if err != nil {
-		obic.Ctx.WriteString("Fail: redis getall fail!\n")
+		obic.Ctx.WriteString("Fail!\n")
 		logging.GetLogger().WithFields(logrus.Fields{
 			"package" : "controllers",
 			"file" : "offer_svrloadinfo.go",

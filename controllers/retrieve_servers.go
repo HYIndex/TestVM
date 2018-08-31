@@ -28,7 +28,7 @@ func (rsc *RetrieveServersController) Get() {
 
 	rdsm := new(redismanager.RedisManager)
 	if ok, _ := rdsm.Connect(host, port); !ok {
-		rsc.Ctx.WriteString("Fail: redis connect fail!\n")
+		rsc.Ctx.WriteString("Fail!\n")
 		logging.GetLogger().WithFields(logrus.Fields{
 			"package" : "controllers",
 			"file" : "retrieve_servers.go",
@@ -38,7 +38,7 @@ func (rsc *RetrieveServersController) Get() {
 	defer rdsm.Close()
 	ret, err := rdsm.GetAll(rdskeyname)
 	if err != nil {
-		rsc.Ctx.WriteString("Fail: redis getall fail!\n")
+		rsc.Ctx.WriteString("Fail\n")
 		logging.GetLogger().WithFields(logrus.Fields{
 			"package" : "controllers",
 			"file" : "retrieve_servers.go",
@@ -50,7 +50,7 @@ func (rsc *RetrieveServersController) Get() {
 		tmpStream := make(loadinfo.StreamsAmt)
 		tmpStream = tmpStream.FromString(v)
 		if tmpStream == nil {
-			rsc.Ctx.WriteString("Fail: StreamAmt convert from string fail!\n")
+			rsc.Ctx.WriteString("Fail\n")
 			logging.GetLogger().WithFields(logrus.Fields{
 				"package" : "controllers",
 				"file" : "retrieve_servers.go",
@@ -64,11 +64,11 @@ func (rsc *RetrieveServersController) Get() {
 	totalSubStream := totalStreamInfo.GetTotalSub()
 	if totalSubStream > limit {
 		rsc.SetStatus(0)
-		rsc.Ctx.WriteString("no usalbe lbaddress: substreaming more than limit\n")
+		rsc.Ctx.WriteString("no usalbe lbaddress\n")
 		logging.GetLogger().WithFields(logrus.Fields{
 			"package" : "controllers",
 			"file" : "retrieve_servers.go",
-		}).Infoln("no usalbe lbaddress: substreaming more than limit!")
+		}).Infoln("no usalbe lbaddress!\n")
 	} else {
 		rsc.SetStatus(1)
 		rsc.Ctx.WriteString(lbaddr)
