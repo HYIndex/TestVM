@@ -13,6 +13,10 @@
 ### 下载依赖包
 > go get *package name*
 
-## 运行
+## 编译
 > cd 到testvm目录
-> $ bee run
+>
+> $ sh build.sh
+
+## 运行
+> $ ./bin/testvm
